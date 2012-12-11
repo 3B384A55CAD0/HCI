@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<style type="text/css">
+			html {
+				height: 100%
+			}
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0
+			}
+			#map_canvas {
+				height: 100%
+			}
+		</style>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCscKVyBTkwd83mGUN9J-BU459rgpfDlpc&sensor=true"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script type="text/javascript">
+			var marker;
+			var map;
+			var polyline;
+			var directionDisplay;
+			var directionsService = new google.maps.DirectionsService();
+			var tilesAreLoaded = false; //Per fare in modo che si aspetti se la connessione è troppo lenta
+
+			$(document).ready(function() {
+				var mapOptions = {
+					center : new google.maps.LatLng(44.2996, 10.9916),
+					zoom : 18,
+					mapTypeId : google.maps.MapTypeId.HYBRID
+				};
+				map = new google.maps.Map($("#map_canvas")[0], mapOptions);
+
+				marker = new google.maps.Marker({
+					map : map,
+					animation : google.maps.Animation.DROP,
+					position : new google.maps.LatLng(44.2996, 10.9916)
+				});
+
+				polyline = new google.maps.Polyline({
+					path : [],
+					strokeColor : '#000000',
+					strokeWeight : 2
+				});
+
+				directionsDisplay = new google.maps.DirectionsRenderer({
+					map : map
+				});
+				
+				google.maps.event.addListener(map, 'tilesloaded', function() {
+					tilesAreLoaded = true;
+					$("#tilesAreLoaded").html(tilesAreLoaded);
+				});
+			
+
+			});
+
+			function calculateRoute() {
+				var request = {
+					origin : "Bologna, BO, Italia",
+					destination : "Gaggio Montano, BO, Italia",
+					travelMode : google.maps.DirectionsTravelMode.DRIVING
+				};
+				directionsService.route(request, function(response, status) {
+					//Il response è di tipo google.maps.DirectionsResult
+					//ha routes che è una lista di google.maps.DirectionsRoute
+
+					if (status == google.maps.DirectionsStatus.OK) {
+						
+						//la facciamo crescere in modo che contenga tutta la path
+						var bounds = new google.maps.LatLngBounds();
+
+						//Prendiamo solamente la prima route e prendiamo le google.maps.DirectionsLeg che
+						//rappresentano una lista di google.maps.DirectionsStep
+						//le legs contengono anche altre cose come la durata ecc...
+						//Se non ci sono waypoints allora c'è solo un leg
+						var legs = response.routes[0].legs;
+
+						for (i = 0; i < legs.length; i++) {
+							var steps = legs[i].steps;
+							for (j = 0; j < steps.length; j++) {
+								var segm = steps[j].path;
+								for (k = 0; k < segm.length; k++) {
+									polyline.getPath().push(segm[k]);
+									bounds.extend(segm[k]);
+								}
+							}
+						}
+
+						alert(polyline.getPath().length);
+
+						polyline.setMap(map);
+						//map.fitBounds(bounds);
+						$("#points").html(polyline.getPath().length);
+						moveCamera(0);
+						
+						//directionsDisplay.setDirections(response);
+					}
+				});
+			}
+			
+			
+			function moveCamera(i){
+				//if(!tilesAreLoaded){
+				//	setTimeout("moveCamera(" + i + ")", 1);
+				//	return;
+				//}
+				if(i >= polyline.getPath().length) return;
+				map.panTo(polyline.getPath().getAt(i));
+				marker.setPosition(polyline.getPath().getAt(i));
+				$("#currentPoint").html(i);
+				
+				//tilesAreLoaded = false;
+				//$("#tilesAreLoaded").html(tilesAreLoaded);
+				setTimeout("moveCamera(" + (i+1) + ")", 100);
+			}
+
+		</script>
+	</head>
+	<body>
+		<div id="map_canvas" style="width:80%; height:80%"></div>
+		<input type="button" onclick="calculateRoute()" value="Route" style="margin:20px;"/>
+		<div id="tilesAreLoaded"></div>
+		<div>Points: <span id="points"></span></div>
+		<div>Current Point: <span id="currentPoint"></span></div>
+	</body>
+</html>

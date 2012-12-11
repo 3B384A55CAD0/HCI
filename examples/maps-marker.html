@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<style type="text/css">
+			html {
+				height: 100%
+			}
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0
+			}
+			#map_canvas {
+				height: 100%
+			}
+		</style>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCscKVyBTkwd83mGUN9J-BU459rgpfDlpc&sensor=true"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script type="text/javascript">
+			var marker;
+			var map;
+			var gaggioPosition;
+			geocoder = new google.maps.Geocoder();
+
+			$(document).ready(function() {
+				var mapOptions = {
+					zoom : 15,
+					mapTypeId : google.maps.MapTypeId.HYBRID
+				};
+				map = new google.maps.Map($("#map_canvas")[0], mapOptions);
+				
+				geocoder.geocode( { 'address': 'Gaggio Montano, BO, Italia'}, function(results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						gaggioPosition = results[0].geometry.location;
+						
+						map.setCenter(gaggioPosition);
+						
+						marker = new google.maps.Marker({
+							map : map,
+							animation : google.maps.Animation.DROP,
+							position : gaggioPosition
+						});
+
+					}else{
+						alert("Geocode non trovata (" + status + ")");
+					}
+				});
+				
+			});
+  			
+		</script>
+	</head>
+	<body>
+		<div id="map_canvas" style="width:50%; height:50%"></div>
+	</body>
+</html>
