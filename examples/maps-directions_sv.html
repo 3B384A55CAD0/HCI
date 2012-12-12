@@ -29,6 +29,7 @@
 			var movementStep = 2;
 			var mapMoveLap = 50;
 			var mapMoveLapCounter = 0;
+			var mapMoveCameraBoundPercentage = 0.1 // when pos is at this percentage from bounds move camera
 			var movementSleep = 100;
 			var heading;
 
@@ -211,12 +212,12 @@
 							
 				mapContrainedBounds = new google.maps.LatLngBounds(
 					new google.maps.LatLng(
-						swMapBounds.lat() + mapBoundsSize.width * 0.1,
-						swMapBounds.lng() + mapBoundsSize.height * 0.1
+						swMapBounds.lat() + mapBoundsSize.width * mapMoveCameraBoundPercentage,
+						swMapBounds.lng() + mapBoundsSize.height * mapMoveCameraBoundPercentage
 					),
 					new google.maps.LatLng(
-						neMapBounds.lat() - mapBoundsSize.width * 0.1,
-						neMapBounds.lng() - mapBoundsSize.height * 0.1
+						neMapBounds.lat() - mapBoundsSize.width * mapMoveCameraBoundPercentage,
+						neMapBounds.lng() - mapBoundsSize.height * mapMoveCameraBoundPercentage
 					)
 				);
 				
