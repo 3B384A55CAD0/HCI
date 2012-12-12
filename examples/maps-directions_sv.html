@@ -14,7 +14,6 @@
 				- Considerare se far stampare o no il polyline
 			*/
 
-
 			var directionsService;
 
 			var map;
@@ -42,7 +41,7 @@
 					mapTypeId : google.maps.MapTypeId.HYBRID
 				});
 
-				/*panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
+				panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
 				  position: new google.maps.LatLng(44.496, 11.338),
 				  pov: {
 				    heading: 0,
@@ -50,7 +49,7 @@
 				    zoom: 1
 				  }
 				});
-				map.setStreetView(panorama);*/
+				map.setStreetView(panorama);
 
 			});
 
@@ -204,9 +203,27 @@
 				//--------------------------------------------------
 
 				//StreetView----------------
-				//panorama.setPosition(pos);
-				//TODO: panorame.setPov(una certa StreetViewPov) (calcolare bene heading in base al passo precedente)
-				//TODO: rotazione heading
+				panorama.setPosition(pos);
+				//TODO: panorama.setPov(una certa StreetViewPov) (calcolare bene heading in base al passo precedente)
+				//TODO: rotazione heading				
+
+				
+				
+				//distance1 = latLngDistance(circles[numCircles-2].getCenter().lat(), 0, circles[numCircles-1].getCenter().lat(), 0);
+				//distance2 = latLngDistance(0, circles[numCircles-2].getCenter().lng(), 0, circles[numCircles-1].getCenter().lng());
+
+				distance1 = circles[numCircles-1].getCenter().lat() - circles[0].getCenter().lat();
+				distance2 = circles[numCircles-1].getCenter().lng() - circles[0].getCenter().lng();
+
+				forwardAngle = Math.atan2(distance2, distance1) * (180/Math.PI);
+				
+				console.log(forwardAngle);
+
+				panorama.setPov({
+					heading: forwardAngle,
+					pitch: 0,
+					zoom: 1
+				});
 				//--------------------------
 				 
 				//Mostra la distanza attuale percorsa
