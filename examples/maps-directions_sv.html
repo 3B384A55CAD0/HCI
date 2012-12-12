@@ -42,7 +42,7 @@
 					mapTypeId : google.maps.MapTypeId.HYBRID
 				});
 
-				/*panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
+				panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
 				  position: new google.maps.LatLng(44.496, 11.338),
 				  pov: {
 				    heading: 0,
@@ -50,7 +50,7 @@
 				    zoom: 1
 				  }
 				});
-				map.setStreetView(panorama);*/
+				map.setStreetView(panorama);
 
 			});
 
@@ -199,6 +199,31 @@
 
 				//Questo stabilisce ogni quano bisogna muovere il center della mappa
 				//TODO: muovere osservando il bounds (in metri) della mappa e i passi (in metri) che sono stati fatti
+				
+				
+				mapBounds = map.getBounds();
+				swMapBounds = mapBounds.getSouthWest()
+				neMapBounds = mapBounds.getNorthEast()
+				mapBoundsSize = {
+					'width':  neMapBounds.lat() - swMapBounds.lat(),
+					'height': neMapBounds.lng() - swMapBounds.lng()
+				}
+							
+				mapContrainedBounds = new google.maps.LatLngBounds(
+					new google.maps.LatLng(
+						swMapBounds.lat() + mapBoundsSize.width * 0.1,
+						swMapBounds.lng() + mapBoundsSize.height * 0.1
+					),
+					new google.maps.LatLng(
+						neMapBounds.lat() - mapBoundsSize.width * 0.1,
+						neMapBounds.lng() - mapBoundsSize.height * 0.1
+					)
+				);
+				
+				if (!mapContrainedBounds.contains(pos))
+					map.panTo(pos);
+				
+				/*
 				if(++mapMoveLapCounter >= mapMoveLap){
 					mapBounds = map.getBounds();
 					var latDistance = latLngDistance(lastCircleCoords.lat(), 0, firstCircleCoords.lat(), 0);
@@ -206,6 +231,7 @@
 					map.panTo(pos);
 					mapMoveLapCounter = 0;
 				}
+				*/
 
 				//Calcolo delle posizioni dei cerchi----------------
 				for(j = 0; j < numCircles - 1; j++){
@@ -214,13 +240,11 @@
 				circles[numCircles-1].setCenter(pos);
 				//--------------------------------------------------
 
-				/*//StreetView----------------
+				//StreetView----------------
 				panorama.setPosition(pos);
 				//TODO: panorama.setPov(una certa StreetViewPov) (calcolare bene heading in base al passo precedente)
 				//TODO: rotazione heading				
 
-				
-				
 				var firstCircleCoords = circles[0].getCenter(); //circles[numCircles-2].getCenter();
 				var lastCircleCoords = circles[numCircles-1].getCenter(); //getPathPointFromMetres(polyline.getPath(), metres + movementSleep);
 				
@@ -247,7 +271,6 @@
 				}
 				//heading = Math.floor(heading/15) * 15;
 
-				*/
 				//--------------------------
 				 
 				//Mostra la distanza attuale percorsa
