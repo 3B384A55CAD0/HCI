@@ -15,6 +15,7 @@ visualPaths = {
 	polyline: null,
 	mapBounds: null,
 	circles: new Array(this.numCircles),
+	coveredDistance: 0,
 	distance: null,				
 	heading: -Number.MAX_VALUE,
 	
@@ -104,12 +105,12 @@ visualPaths = {
 	
 	pointExceedMaximumBoundsDistancePercentage: function (pos, percentage) {
 		var mapBounds = this.map.getBounds();
-		var swMapBounds = mapBounds.getSouthWest()
-		var neMapBounds = mapBounds.getNorthEast()
+		var swMapBounds = mapBounds.getSouthWest();
+		var neMapBounds = mapBounds.getNorthEast();
 		var mapBoundsSize = {
 			'width':  neMapBounds.lat() - swMapBounds.lat(),
 			'height': neMapBounds.lng() - swMapBounds.lng()
-		}
+		};
 
 		var mapConstrainedBounds = new google.maps.LatLngBounds(
 			new google.maps.LatLng(
@@ -150,13 +151,13 @@ visualPaths = {
 		return this.rad2deg(Math.atan2(lngDistance, latDistance));
 	},
 	
-	animatePath: function (metres) {
+	animatePath: function () {
 		/* End iterations if the end of the path is reached */
-		if (metres >= this.distance) 
+		if (this.coveredDistance >= this.distance) 
 			return;
 
 		/* Retrive current position */
-		var pos = this.getPathPointFromMetres(this.polyline.getPath(), metres);
+		var pos = this.getPathPointFromMetres(this.polyline.getPath(), this.coveredDistance);
 		
 		/* Move map if current position is too near to map bounds */
 		if (this.pointExceedMaximumBoundsDistancePercentage(pos, this.moveCameraBoundPercentage))
@@ -183,9 +184,13 @@ visualPaths = {
 				zoom: 1
 			});
 		}
+		
+		/* update covered distance */
+		this.coveredDistance += this.movementStep;
 
-		/* Loop back again */					
-		setTimeout("visualPaths.animatePath(" + (metres + this.movementStep) + ")", this.movementSleep);
+		/* Loop back again */
+		oldThis = this;
+		setTimeout(function () { oldThis.animatePath(); }, this.movementSleep);
 	},
 
 	/* User callable functions */
@@ -285,5 +290,5 @@ visualPaths = {
 				oldThis.animatePath(0);							
 			}
 		});
-	},
+	}
 };
