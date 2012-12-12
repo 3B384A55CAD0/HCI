@@ -222,12 +222,14 @@ visualPaths = {
 			travelMode : google.maps.DirectionsTravelMode.DRIVING
 		};
 		
+		oldThis = this;
+		
 		this.directionsService.route(request, function (response, status) {
 			/* If a route is successfully retrived */
 			if (status == google.maps.DirectionsStatus.OK) {
 				/* Initialize circles on the map with decreasing radius size */
-				for (var i = 0; i < visualPaths.numCircles; i++) {
-					visualPaths.circles[i] = new google.maps.Circle({
+				for (var i = 0; i < oldThis.numCircles; i++) {
+					oldThis.circles[i] = new google.maps.Circle({
 						fillColor: "#FF0000",
 						strokeColor: "#FF0000",
 						fillOpacity: 0.35,
@@ -241,7 +243,7 @@ visualPaths = {
 				/* Initialize polyline used to manage routing 
 				 * points and to show current path 
 				 */
-				visualPaths.polyline = new google.maps.Polyline({
+				oldThis.polyline = new google.maps.Polyline({
 					path : [],
 					strokeColor : '#00FF00',
 					strokeWeight : 2
@@ -256,31 +258,31 @@ visualPaths = {
 					for (var j in steps){
 						var points = steps[j].path;
 						for (var k in points){
-							visualPaths.polyline.getPath().push(points[k]);
+							oldThis.polyline.getPath().push(points[k]);
 						}
 					}
 				}
 
 				/* Retrive total distance of the path */
-				visualPaths.distance = visualPaths.pathLength(visualPaths.polyline.getPath());
+				oldThis.distance = oldThis.pathLength(oldThis.polyline.getPath());
 				
 				/* Add polyline to map in order to draw it */
-				visualPaths.polyline.setMap(visualPaths.map);
+				oldThis.polyline.setMap(oldThis.map);
 
 				/* Get starting point of the path */
-				var initialPoint = visualPaths.polyline.getPath().getAt(0);
+				var initialPoint = oldThis.polyline.getPath().getAt(0);
 				
 				/* Center map on starting point of the path */
-				visualPaths.map.panTo(initialPoint);
+				oldThis.map.panTo(initialPoint);
 				
 				/* Draw circles on the map on the starting point */
-				for(i=0; i < visualPaths.numCircles; i++){
-					visualPaths.circles[i].setMap(visualPaths.map);
-					visualPaths.circles[i].setCenter(initialPoint);
+				for(i=0; i < oldThis.numCircles; i++){
+					oldThis.circles[i].setMap(oldThis.map);
+					oldThis.circles[i].setCenter(initialPoint);
 				}
 
 				/* Launch path animation management deamon */
-				visualPaths.animatePath(0);							
+				oldThis.animatePath(0);							
 			}
 		});
 	},
