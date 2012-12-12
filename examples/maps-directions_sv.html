@@ -15,63 +15,42 @@
 			*/
 
 
+			var directionsService;
+
 			var map;
 			var panorama;
+			
 			var polyline;
-			var directionDisplay;
-			var directionsService = new google.maps.DirectionsService();
+
 			var distance;
 			var zoom = 18;
 			var mapBounds;
-			var numCircles = 10;
+			var numCircles = 5;
 			var circles = new Array(numCircles);
-			var movementStep = 5;
-			var mapMoveLap = 10;
+			var movementStep = 2;
+			var mapMoveLap = 50;
 			var mapMoveLapCounter = 0;
 			var movementSleep = 100;
 
 			$(document).ready(function() {
-				var mapOptions = {
+
+ 				directionsService = new google.maps.DirectionsService();
+
+				map = new google.maps.Map($("#map_canvas")[0], {
 					center : new google.maps.LatLng(44.496, 11.338),
 					zoom : zoom,
 					mapTypeId : google.maps.MapTypeId.HYBRID
-				};
-				map = new google.maps.Map($("#map_canvas")[0], mapOptions);
+				});
 
-				var panoramaOptions = {
+				/*panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
 				  position: new google.maps.LatLng(44.496, 11.338),
 				  pov: {
-				    heading: 34,
-				    pitch: 10,
+				    heading: 0,
+				    pitch: 0,
 				    zoom: 1
 				  }
-				};
-				//panorama = new  google.maps.StreetViewPanorama($("#map_canvas")[0], panoramaOptions);
-				panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], panoramaOptions);
-				map.setStreetView(panorama);
-
-				for(i = 0; i < numCircles; i++){
-					circles[i] = new google.maps.Circle({
-						fillColor: "#FF0000",
-						strokeColor: "#FF0000",
-						fillOpacity: 0.35,
-						strokeOpacity: 0.8,
-						strokeWeight: 1,
-						map: map,
-						center: new google.maps.LatLng(44.496, 11.338),
-						radius: i/2
-				    });
-				}
-
-				polyline = new google.maps.Polyline({
-					path : [],
-					strokeColor : '#00FF00',
-					strokeWeight : 2
 				});
-
-				directionsDisplay = new google.maps.DirectionsRenderer({
-					map : map
-				});
+				map.setStreetView(panorama);*/
 
 			});
 
@@ -86,38 +65,58 @@
 					//ha routes che è una lista di google.maps.DirectionsRoute
 
 					if (status == google.maps.DirectionsStatus.OK) {
-						
-						//la facciamo crescere in modo che contenga tutta la path
-						var bounds = new google.maps.LatLngBounds();
+
+						for(i = 0; i < numCircles; i++){
+							circles[i] = new google.maps.Circle({
+								fillColor: "#FF0000",
+								strokeColor: "#FF0000",
+								fillOpacity: 0.35,
+								strokeOpacity: 0.8,
+								strokeWeight: 1,
+								center: new google.maps.LatLng(44.496, 11.338),
+								radius: i/2
+						    });
+						}
+
+						polyline = new google.maps.Polyline({
+							path : [],
+							strokeColor : '#00FF00',
+							strokeWeight : 2
+						});
 
 						//Prendiamo solamente la prima route e prendiamo le google.maps.DirectionsLeg che
 						//rappresentano una lista di google.maps.DirectionsStep
 						//le legs contengono anche altre cose come la durata ecc...
 						//Se non ci sono waypoints allora c'è solo un leg
 						var legs = response.routes[0].legs;
+						path = new Array();
 
-						for (i = 0; i < legs.length; i++) {
+						for (var i in legs){
 							var steps = legs[i].steps;
-							for (j = 0; j < steps.length; j++) {
-								var segm = steps[j].path;
-								for (k = 0; k < segm.length; k++) {
-									polyline.getPath().push(segm[k]);
-									bounds.extend(segm[k]);
+							for (var j in steps){
+								var points = steps[j].path;
+								for (var k in points){
+									polyline.getPath().push(points[k]);
 								}
 							}
 						}
 
 						polyline.setMap(map);
+
 						distance = pathLength(polyline.getPath());
-						$("#routeDistance").html(distanceToString(distance));
+						
+						//$("#routeDistance").html(distanceToString(distance));
+						
 						var initialPoint = polyline.getPath().getAt(0);
 						map.panTo(initialPoint);
 						for(i=0; i < numCircles; i++){
+							circles[i].setMap(map);
 							circles[i].setCenter(initialPoint);
 						}
+
 						animatePath(0);
 						
-						//directionsDisplay.setDirections(response);
+						
 					}
 				});
 			}
@@ -125,7 +124,7 @@
 			// Calculate the distance of two point
 			// http://en.wikipedia.org/wiki/Haversine_formula
 			function latLngDistance(lat1, lng1, lat2, lng2) {
-				var R = 6378136.6; //in metres (http://en.wikipedia.org/wiki/Figure_of_the_Earth)
+				var R = 6378136.6; //Earth radius in metres (http://en.wikipedia.org/wiki/Figure_of_the_Earth)
 				var dLat = (lat2-lat1) * Math.PI / 180; //(lat2-lat1).toRad()
 				var dLon = (lng2-lng1) * Math.PI / 180; //(lng2-lng1).toRad()
 				var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
@@ -205,12 +204,13 @@
 				//--------------------------------------------------
 
 				//StreetView----------------
-				panorama.setPosition(pos);
+				//panorama.setPosition(pos);
 				//TODO: panorame.setPov(una certa StreetViewPov) (calcolare bene heading in base al passo precedente)
+				//TODO: rotazione heading
 				//--------------------------
 				 
 				//Mostra la distanza attuale percorsa
-				$("#currentDistance").html(distanceToString(metres));
+				//$("#currentDistance").html(distanceToString(metres));
 				
 				setTimeout("animatePath(" + (metres + movementStep) + ")", movementSleep);
 			}
