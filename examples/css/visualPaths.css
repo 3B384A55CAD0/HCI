@@ -1,0 +1,14 @@
+#map_canvas, #map_streetview {
+	float: left; 
+	width: 400px; 
+	height: 400px
+}
+
+#toolBox {
+	width: 100%; 
+	float: left;
+}
+
+#routeButton {
+	margin: 20px;
+}
