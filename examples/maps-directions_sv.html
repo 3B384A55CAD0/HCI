@@ -30,6 +30,7 @@
 			var mapMoveLap = 50;
 			var mapMoveLapCounter = 0;
 			var movementSleep = 100;
+			var heading;
 
 			$(document).ready(function() {
 
@@ -41,7 +42,7 @@
 					mapTypeId : google.maps.MapTypeId.HYBRID
 				});
 
-				panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
+				/*panorama = new  google.maps.StreetViewPanorama($("#map_streetview")[0], {
 				  position: new google.maps.LatLng(44.496, 11.338),
 				  pov: {
 				    heading: 0,
@@ -49,14 +50,14 @@
 				    zoom: 1
 				  }
 				});
-				map.setStreetView(panorama);
+				map.setStreetView(panorama);*/
 
 			});
 
 			function calculateRoute() {
 				var request = {
-					origin : "Casalecchio di Reno, BO, Italia",
-					destination : "Bologna, BO, Italia",
+					origin : "Gaggio Montano, BO, Italia", //"Bologna, BO, Italia",
+					destination : "Lizzano in Belvedere, BO, Italia", //"Casalecchio di Reno, BO, Italia",
 					travelMode : google.maps.DirectionsTravelMode.DRIVING
 				};
 				directionsService.route(request, function(response, status) {
@@ -113,8 +114,8 @@
 							circles[i].setCenter(initialPoint);
 						}
 
+						heading = - Number.MAX_VALUE;
 						animatePath(0);
-						
 						
 					}
 				});
@@ -199,6 +200,9 @@
 				//Questo stabilisce ogni quano bisogna muovere il center della mappa
 				//TODO: muovere osservando il bounds (in metri) della mappa e i passi (in metri) che sono stati fatti
 				if(++mapMoveLapCounter >= mapMoveLap){
+					mapBounds = map.getBounds();
+					var latDistance = latLngDistance(lastCircleCoords.lat(), 0, firstCircleCoords.lat(), 0);
+					var lngDistance = latLngDistance(0, lastCircleCoords.lng(), 0, firstCircleCoords.lng());
 					map.panTo(pos);
 					mapMoveLapCounter = 0;
 				}
@@ -210,15 +214,15 @@
 				circles[numCircles-1].setCenter(pos);
 				//--------------------------------------------------
 
-				//StreetView----------------
+				/*//StreetView----------------
 				panorama.setPosition(pos);
 				//TODO: panorama.setPov(una certa StreetViewPov) (calcolare bene heading in base al passo precedente)
 				//TODO: rotazione heading				
 
 				
 				
-				var firstCircleCoords = circles[0].getCenter();
-				var lastCircleCoords = circles[numCircles-1].getCenter();
+				var firstCircleCoords = circles[0].getCenter(); //circles[numCircles-2].getCenter();
+				var lastCircleCoords = circles[numCircles-1].getCenter(); //getPathPointFromMetres(polyline.getPath(), metres + movementSleep);
 				
 				var latDistance = latLngDistance(lastCircleCoords.lat(), 0, firstCircleCoords.lat(), 0);
 				var lngDistance = latLngDistance(0, lastCircleCoords.lng(), 0, firstCircleCoords.lng());
@@ -232,13 +236,18 @@
 				//var latDistance = circles[numCircles-1].getCenter().lat() - circles[0].getCenter().lat();
 				//var lngDistance = circles[numCircles-1].getCenter().lng() - circles[0].getCenter().lng();
 
-				var heading = toDeg(Math.atan2(lngDistance, latDistance));
+				var newHeading = toDeg(Math.atan2(lngDistance, latDistance));
+				if (Math.abs(newHeading - heading) > 5){
+					heading = newHeading;
+					panorama.setPov({
+						heading: heading,
+						pitch: 0,
+						zoom: 1
+					});
+				}
+				//heading = Math.floor(heading/15) * 15;
 
-				panorama.setPov({
-					heading: heading,
-					pitch: 0,
-					zoom: 1
-				});
+				*/
 				//--------------------------
 				 
 				//Mostra la distanza attuale percorsa
