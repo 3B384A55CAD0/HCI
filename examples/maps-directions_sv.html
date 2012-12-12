@@ -120,14 +120,22 @@
 				});
 			}
 			
+			function toDeg(radiants) {
+				return radiants * 180 / Math.PI;
+			}
+			
+			function toRad(degrees) {
+				return degrees * Math.PI / 180;
+			}
+			
 			// Calculate the distance of two point
 			// http://en.wikipedia.org/wiki/Haversine_formula
 			function latLngDistance(lat1, lng1, lat2, lng2) {
 				var R = 6378136.6; //Earth radius in metres (http://en.wikipedia.org/wiki/Figure_of_the_Earth)
-				var dLat = (lat2-lat1) * Math.PI / 180; //(lat2-lat1).toRad()
-				var dLon = (lng2-lng1) * Math.PI / 180; //(lng2-lng1).toRad()
+				var dLat = toRad(lat2-lat1);
+				var dLon = toRad(lng2-lng1);
 				var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
-						Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
+						Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(toRad(lat1)) * Math.cos(toRad(lat2));
 				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 				return R * c;
 			}
@@ -209,18 +217,25 @@
 
 				
 				
-				//distance1 = latLngDistance(circles[numCircles-2].getCenter().lat(), 0, circles[numCircles-1].getCenter().lat(), 0);
-				//distance2 = latLngDistance(0, circles[numCircles-2].getCenter().lng(), 0, circles[numCircles-1].getCenter().lng());
-
-				distance1 = circles[numCircles-1].getCenter().lat() - circles[0].getCenter().lat();
-				distance2 = circles[numCircles-1].getCenter().lng() - circles[0].getCenter().lng();
-
-				forwardAngle = Math.atan2(distance2, distance1) * (180/Math.PI);
+				var firstCircleCoords = circles[0].getCenter();
+				var lastCircleCoords = circles[numCircles-1].getCenter();
 				
-				console.log(forwardAngle);
+				var latDistance = latLngDistance(lastCircleCoords.lat(), 0, firstCircleCoords.lat(), 0);
+				var lngDistance = latLngDistance(0, lastCircleCoords.lng(), 0, firstCircleCoords.lng());
+				
+				if (lastCircleCoords.lat() < firstCircleCoords.lat())
+					latDistance *= -1;
+
+				if (lastCircleCoords.lng() < firstCircleCoords.lng())
+					lngDistance *= -1;
+
+				//var latDistance = circles[numCircles-1].getCenter().lat() - circles[0].getCenter().lat();
+				//var lngDistance = circles[numCircles-1].getCenter().lng() - circles[0].getCenter().lng();
+
+				var heading = toDeg(Math.atan2(lngDistance, latDistance));
 
 				panorama.setPov({
-					heading: forwardAngle,
+					heading: heading,
 					pitch: 0,
 					zoom: 1
 				});
