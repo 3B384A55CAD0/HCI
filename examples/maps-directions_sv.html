@@ -12,7 +12,15 @@
 				var birdEyeCanvas = $("#map_canvas")[0];
 				var streetViewCanvas = $("#map_streetview")[0]
 				
+				var from = 'Gaggio Montano, BO, Italia';
+				var to = 'Lizzano in Belvedere, BO, Italia';
+				
 				visualPaths.init(birdEyeCanvas, streetViewCanvas);
+				
+				$("#routeButton").click(function () {
+					$(this).attr("disabled", "disabled");
+					visualPaths.calculateRoute(from, to);
+				});
 			});
 
 		</script>		
@@ -22,7 +30,7 @@
 		<div id="map_streetview"></div>
 		
 		<div id="toolBox">			
-			<input type="button" onclick="visualPaths.calculateRoute('Gaggio Montano, BO, Italia', 'Lizzano in Belvedere, BO, Italia')" value="Route" id="routeButton"/>
+			<input type="button" value="Route" id="routeButton"/>
 		</div>
 	</body>
 </html>
