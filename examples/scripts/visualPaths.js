@@ -4,8 +4,9 @@ visualPaths = {
 	zoom: 18,
 	numCircles: 5,
 	movementStep: 1,
+	useMetres: false,
 	moveCameraBoundPercentage: 0.1,
-	movementSleep: 100,
+	movementSleep: 500,
 	
 	/* Globals */
 	
@@ -16,7 +17,7 @@ visualPaths = {
 	mapBounds: null,
 	circles: new Array(this.numCircles),
 	coveredDistance: 0,
-	distance: null,				
+	distance: null,
 	heading: -Number.MAX_VALUE,
 	
 	/* Library functions */
@@ -157,7 +158,10 @@ visualPaths = {
 			return;
 
 		/* Retrive current position */
-		var pos = this.getPathPointFromMetres(this.polyline.getPath(), this.coveredDistance);
+		if (this.useMetres)
+			var pos = this.getPathPointFromMetres(this.polyline.getPath(), this.coveredDistance);
+		else
+			var pos = this.polyline.getPath().getAt(this.coveredDistance);
 		
 		/* Move map if current position is too near to map bounds */
 		if (this.pointExceedMaximumBoundsDistancePercentage(pos, this.moveCameraBoundPercentage))
@@ -215,7 +219,10 @@ visualPaths = {
 				zoom: 1
 			}
 		});
-		
+
+
+		if (!this.useMetres) this.movementStep = 1;
+
 		/* Link street-view to current map */
 		this.map.setStreetView(this.panorama);
 	},
@@ -269,7 +276,10 @@ visualPaths = {
 				}
 
 				/* Retrive total distance of the path */
-				oldThis.distance = oldThis.pathLength(oldThis.polyline.getPath());
+				if (this.useMetres)
+					oldThis.distance = oldThis.pathLength(oldThis.polyline.getPath());
+				else
+					oldThis.distance = oldThis.polyline.getPath().length;
 				
 				/* Add polyline to map in order to draw it */
 				oldThis.polyline.setMap(oldThis.map);
