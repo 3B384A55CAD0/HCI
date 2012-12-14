@@ -10,10 +10,12 @@ visualPaths = {
 	
 	/* Globals */
 	
+	paused: false,
+	stopped: false,
 	useStreetView: false,
 	directionsService: null,
 	map: null,
-	panorama: null,				
+	panorama: null,
 	polyline: null,
 	mapBounds: null,
 	circles: new Array(this.numCircles),
@@ -158,12 +160,34 @@ visualPaths = {
 		return Math.exp(-Math.abs(alpha));
 	},
 	
+	stop: function() {
+		this.coveredDistance = 0;
+		this.stopped = true;
+	},
+
+	pause: function() {
+		this.paused = true;
+	},
+
+	play: function() {
+		this.paused = false;
+		this.stopped = false;
+	},
+
 	animatePath: function () {
+		var oldThis = this;
+
 		/* End iterations if the end of the path is reached */
 		if (this.coveredDistance >= this.distance) 
 			return;
 
-		if(this.stopped == true) return;
+		if (this.paused){
+			setTimeout(function () { oldThis.animatePath(); }, 100);
+			return;
+		}
+
+		if (this.stopped == true)
+			this.coveredDistance = 0;
 
 		/* Retrive current position */
 		if (this.useMetres)
@@ -213,10 +237,13 @@ visualPaths = {
 		this.alpha = newAlpha;
 
 		/* Loop back again */
-		var oldThis = this;
 		var sleepTime = Math.min(500, this.movementSleep / this.angleDeviation(newAlpha - alpha));
 		
-		setTimeout(function () { oldThis.animatePath(); }, sleepTime);
+		if(this.stopped){
+			for (j = 0; j < this.numCircles; j++) this.circles[j].setCenter(pos);
+		}else{
+			setTimeout(function () { oldThis.animatePath(); }, sleepTime);
+		}
 	},
 
 	/* User callable functions */

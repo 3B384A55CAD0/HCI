@@ -10,16 +10,16 @@
     	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 		<script type="text/javascript" src="scripts/visualPaths.js"></script>
 		<script type="text/javascript">
-		
 			
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
 				var streetViewCanvas = $("#map_streetview")[0]
 				
-				visualPaths.init(canvas, false, slider);
+				visualPaths.init(canvas, false);				
 				
 				$("#playButton").click(play);
 				$("#stopButton").click(stop);
+				$("#pauseButton").click(pause);
 							
 				$("#fromText").keyup(checkFromAndTo);
 				$("#toText").keyup(checkFromAndTo);
@@ -28,15 +28,25 @@
 			});
 
 			function play(){
+				visualPaths.play();
 				if($("#fromText").val() == "" || $("#toText").val() == "") return;
 
 				$("#playButton").attr("disabled", "disabled");
 				$("#stopButton").removeAttr("disabled");
+				$("#pauseButton").removeAttr("disabled");
 				visualPaths.calculateRoute($("#fromText").val(), $("#toText").val());
 			}
 
 			function stop(){
+				visualPaths.stop();
 				$("#stopButton").attr("disabled", "disabled");
+				$("#pauseButton").attr("disabled", "disabled");
+				$("#playButton").removeAttr("disabled");
+			}
+
+			function pause(){
+				visualPaths.pause();
+				$("#pauseButton").attr("disabled", "disabled");
 				$("#playButton").removeAttr("disabled");
 			}
 
@@ -56,6 +66,7 @@
 			<input type="text" placeholder="To" id="toText"/>
 			<input type="button" value="Play" disabled="disabled" id="playButton"/>
 			<input type="button" value="Stop" disabled="disabled" id="stopButton"/>
+			<input type="button" value="Pause" disabled="disabled" id="pauseButton"/>
 			<div id="slider"></div>
 		</div>
 		
