@@ -11,11 +11,13 @@
 		<script type="text/javascript" src="scripts/visualPaths.js"></script>
 		<script type="text/javascript">
 			
+			var isSliding = false;
+
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
 				var streetViewCanvas = $("#map_streetview")[0]
 				
-				visualPaths.init(canvas, false);				
+				visualPaths.init(canvas, false, stepCallback, onFinishCallback);		
 				
 				$("#playButton").click(play);
 				$("#stopButton").click(stop);
@@ -24,30 +26,77 @@
 				$("#fromText").keyup(checkFromAndTo);
 				$("#toText").keyup(checkFromAndTo);
 
-				$("#slider").slider();
 			});
 
 			function play(){
-				if($("#fromText").val() == "" || $("#toText").val() == "") return;
+				
+				if ($("#fromText").val() == "" || $("#toText").val() == "") return;
 
 				$("#playButton").attr("disabled", "disabled");
 				$("#stopButton").removeAttr("disabled");
 				$("#pauseButton").removeAttr("disabled");
-				visualPaths.play();
-				if(!visualPaths.paused) visualPaths.calculateRoute($("#fromText").val(), $("#toText").val());
+				$("#fromText").attr("disabled", "disabled");
+				$("#toText").attr("disabled", "disabled");
+
+				if (visualPaths.paused){
+					visualPaths.play();
+				} else { //where it is stopped or at the first time
+					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(){
+
+						$("#slider").slider({
+							range: "min",
+							min: 0,
+							max: visualPaths.totalDistance - 1,
+							value: 0,
+							change: sliderChanged,
+							start: function () { isSliding = true } ,
+							stop: function () { isSliding = false }
+						});
+						
+						visualPaths.play();	
+
+					});
+				}
+				
 			}
 
-			function stop(){
+			function stop() {
 				visualPaths.stop();
 				$("#stopButton").attr("disabled", "disabled");
 				$("#pauseButton").attr("disabled", "disabled");
 				$("#playButton").removeAttr("disabled");
+				$("#fromText").removeAttr("disabled");
+				$("#toText").removeAttr("disabled");
 			}
 
-			function pause(){
+			function pause() {
 				visualPaths.pause();
 				$("#pauseButton").attr("disabled", "disabled");
 				$("#playButton").removeAttr("disabled");
+			}
+
+			function sliderChanged() {
+				visualPaths.coveredDistance = $("#slider").slider("value");
+				if (visualPaths.paused){
+					visualPaths.paused = false;
+					visualPaths.animatePath();
+					visualPaths.paused = true;
+				}
+			}
+
+			/* Called for each step of the animate */
+			function stepCallback() {
+				if (!isSliding)
+					$("#slider").slider("value", visualPaths.coveredDistance);
+			}
+
+			function onFinishCallback() {
+				console.log("finish");
+				$("#stopButton").attr("disabled", "disabled");
+				$("#pauseButton").attr("disabled", "disabled");
+				$("#playButton").removeAttr("disabled");
+				$("#fromText").removeAttr("disabled");
+				$("#toText").removeAttr("disabled");
 			}
 
 			function checkFromAndTo(){

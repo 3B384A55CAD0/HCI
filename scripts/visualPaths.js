@@ -9,9 +9,10 @@ visualPaths = {
 	movementSleep: 200,
 	
 	/* Globals */
-	
+	onFinishCallback: null,
+	stepCallback: null,
 	paused: false,
-	stopped: false,
+	stopped: true,
 	useStreetView: false,
 	directionsService: null,
 	map: null,
@@ -20,7 +21,7 @@ visualPaths = {
 	mapBounds: null,
 	circles: new Array(this.numCircles),
 	coveredDistance: 0,
-	distance: null,
+	totalDistance: null,
 	heading: -Number.MAX_VALUE,
 	alpha: 0,
 	
@@ -163,6 +164,10 @@ visualPaths = {
 	stop: function() {
 		this.coveredDistance = 0;
 		this.stopped = true;
+		this.paused = false;
+
+		/* to move the circles to the fist point */
+		this.animatePath();
 	},
 
 	pause: function() {
@@ -170,18 +175,19 @@ visualPaths = {
 	},
 
 	play: function() {
-		//var oldPause = this.pause;
 		this.stopped = false;
-		this.pause = false;
-		//if (oldPause) this.animatePath();
+		this.paused = false;
+		this.animatePath();
 	},
 
 	animatePath: function () {
 		var oldThis = this;
 
 		/* End iterations if the end of the path is reached */
-		if (this.coveredDistance >= this.distance) 
+		if (this.coveredDistance >= this.totalDistance) {
+			if(this.onFinishCallback != null && typeof(this.onFinishCallback) != undefined) this.onFinishCallback();
 			return;
+		}
 
 		if (this.paused) return;
 
@@ -238,6 +244,8 @@ visualPaths = {
 		/* Loop back again */
 		var sleepTime = Math.min(500, this.movementSleep / this.angleDeviation(newAlpha - alpha));
 		
+		if(this.stepCallback != null && typeof(this.stepCallback) != undefined) this.stepCallback();
+
 		if(this.stopped){
 			for (j = 0; j < this.numCircles; j++) this.circles[j].setCenter(pos);
 		}else{
@@ -247,11 +255,13 @@ visualPaths = {
 
 	/* User callable functions */
 	
-	init: function (canvas, useStreetView) {
+	init: function (canvas, useStreetView, stepCallback, onFinishCallback) {
 		/* Initialize direction service to retrive routing informations */
 		this.directionsService = new google.maps.DirectionsService();
 
 		this.useStreetView = useStreetView;
+		this.stepCallback = stepCallback;
+		this.onFinishCallback = onFinishCallback;
 
 		/* Initialize circles on the map with decreasing radius size */
 		for (var i = 0; i < this.numCircles; i++) {
@@ -301,7 +311,7 @@ visualPaths = {
 		
 	},
 	
-	calculateRoute: function (origin, destination) {
+	calculateRoute: function (origin, destination, callback) {
 		var request = {
 			origin : origin,
 			destination : destination,
@@ -317,6 +327,8 @@ visualPaths = {
 				/* Retrive first possible route */
 				var legs = response.routes[0].legs;
 
+				oldThis.polyline.setPath(new Array());
+				
 				/* Add points in retrived route to polyline */
 				for (var i in legs){
 					var steps = legs[i].steps;
@@ -332,9 +344,11 @@ visualPaths = {
 
 				/* Retrive total distance of the path */
 				if (oldThis.useMetres)
-					oldThis.distance = oldThis.pathLength(oldThis.polyline.getPath());
+					oldThis.totalDistance = oldThis.pathLength(oldThis.polyline.getPath());
 				else
-					oldThis.distance = oldThis.polyline.getPath().length;
+					oldThis.totalDistance = oldThis.polyline.getPath().length;
+
+				oldThis.coveredDistance = 0;
 
 				/* Get starting point of the path */
 				var initialPoint = oldThis.polyline.getPath().getAt(0);
@@ -348,8 +362,7 @@ visualPaths = {
 					oldThis.circles[i].setCenter(initialPoint);
 				}
 
-				/* Launch path animation management deamon */
-				oldThis.animatePath();							
+				if(callback != null && typeof(callback) != undefined) callback();
 			}
 		});
 	}
