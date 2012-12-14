@@ -3,10 +3,10 @@ visualPaths = {
 	
 	zoom: 18,
 	numCircles: 5,
-	movementStep: 1,
-	useMetres: false,
+	movementStep: 5,
+	useMetres: true,
 	moveCameraBoundPercentage: 0.1,
-	movementSleep: 500,
+	movementSleep: 200,
 	
 	/* Globals */
 	
@@ -19,6 +19,7 @@ visualPaths = {
 	coveredDistance: 0,
 	distance: null,
 	heading: -Number.MAX_VALUE,
+	alpha: 0,
 	
 	/* Library functions */
 	
@@ -65,7 +66,7 @@ visualPaths = {
 	 * If a negative number of meters is provided the first point of the path is returned.
 	 * If the number of meters exceed the length of the path the last point is returned instead. 
 	 */
-	getPathPointFromMetres: function (path, metres) {
+	getPathPointByMetres: function (path, metres) {
 		if (metres <= 0) 
 			return path.getAt(0);
 		
@@ -152,6 +153,10 @@ visualPaths = {
 		return this.rad2deg(Math.atan2(lngDistance, latDistance));
 	},
 	
+	angleDeviation: function (alpha, meters) {		
+		return Math.exp(-Math.abs(alpha));
+	},
+	
 	animatePath: function () {
 		/* End iterations if the end of the path is reached */
 		if (this.coveredDistance >= this.distance) 
@@ -159,7 +164,7 @@ visualPaths = {
 
 		/* Retrive current position */
 		if (this.useMetres)
-			var pos = this.getPathPointFromMetres(this.polyline.getPath(), this.coveredDistance);
+			var pos = this.getPathPointByMetres(this.polyline.getPath(), this.coveredDistance);
 		else
 			var pos = this.polyline.getPath().getAt(this.coveredDistance);
 		
@@ -177,10 +182,12 @@ visualPaths = {
 		this.panorama.setPosition(pos);
 		
 		/* Use circles positions to retrive current stree-view point of view 
-		 * and update pov if it is changed of at least 5 degrees 
+		 * and update pov if it is changed of at least 2 degrees 
+		 * 
+		 * NOTE: just to avoid image shakings. 
 		 */
 		var newHeading = this.getCurrentPOV();
-		if (Math.abs(newHeading - this.heading) > 5){
+		if (Math.abs(newHeading - this.heading) > 2){
 			this.heading = newHeading;
 			this.panorama.setPov({
 				heading: this.heading,
@@ -189,12 +196,22 @@ visualPaths = {
 			});
 		}
 		
-		/* update covered distance */
-		this.coveredDistance += this.movementStep;
+		/* Update covered distance by going faster on straight 
+		 * streets and slower on turns.
+		 */
+		
+		var alpha = this.alpha;
+		var newAlpha = this.getCurrentPOV();
+		var speed = this.movementStep * this.angleDeviation(newAlpha - alpha);
+		
+		this.coveredDistance += speed;		
+		this.alpha = newAlpha;
 
 		/* Loop back again */
-		oldThis = this;
-		setTimeout(function () { oldThis.animatePath(); }, this.movementSleep);
+		var oldThis = this;
+		var sleepTime = Math.min(500, this.movementSleep / this.angleDeviation(newAlpha - alpha));
+		
+		setTimeout(function () { oldThis.animatePath(); }, sleepTime);
 	},
 
 	/* User callable functions */
@@ -220,8 +237,8 @@ visualPaths = {
 			}
 		});
 
-
-		if (!this.useMetres) this.movementStep = 1;
+		if (!this.useMetres)
+			this.movementStep = 1;
 
 		/* Link street-view to current map */
 		this.map.setStreetView(this.panorama);
@@ -297,7 +314,7 @@ visualPaths = {
 				}
 
 				/* Launch path animation management deamon */
-				oldThis.animatePath(0);							
+				oldThis.animatePath();							
 			}
 		});
 	}
