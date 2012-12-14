@@ -16,6 +16,7 @@
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
 				
+				visualPaths.movementStep = 10;
 				visualPaths.init(canvas, true, stepCallback, onFinishCallback);		
 				
 				$("#playButton").click(play);
