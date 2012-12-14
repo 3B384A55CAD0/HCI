@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<title>HCI - Visual Paths</title>
+		<link rel="stylesheet" type="text/css" href="css/visualPaths.css" />
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCscKVyBTkwd83mGUN9J-BU459rgpfDlpc&sensor=false"></script>
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+    	<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+		<script type="text/javascript" src="scripts/visualPaths.js"></script>
+		<script type="text/javascript">
+		
+			
+			$(document).ready(function() {
+				var canvas = $("#map_canvas")[0];
+				var streetViewCanvas = $("#map_streetview")[0]
+				
+				visualPaths.init(canvas, false, slider);
+				
+				$("#playButton").click(play);
+				$("#stopButton").click(stop);
+							
+				$("#fromText").keyup(checkFromAndTo);
+				$("#toText").keyup(checkFromAndTo);
+
+				$("#slider").slider();
+			});
+
+			function play(){
+				if($("#fromText").val() == "" || $("#toText").val() == "") return;
+
+				$("#playButton").attr("disabled", "disabled");
+				$("#stopButton").removeAttr("disabled");
+				visualPaths.calculateRoute($("#fromText").val(), $("#toText").val());
+			}
+
+			function stop(){
+				$("#stopButton").attr("disabled", "disabled");
+				$("#playButton").removeAttr("disabled");
+			}
+
+			function checkFromAndTo(){
+				if(($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
+					$("#playButton").removeAttr("disabled");
+				}
+			}
+
+		</script>		
+	</head>
+	<body>
+		<div id="map_canvas"></div>		
+		
+		<div id="toolBox">
+			<input type="text" placeholder="From" id="fromText"/>
+			<input type="text" placeholder="To" id="toText"/>
+			<input type="button" value="Play" disabled="disabled" id="playButton"/>
+			<input type="button" value="Stop" disabled="disabled" id="stopButton"/>
+			<div id="slider"></div>
+		</div>
+		
+	</body>
+</html>

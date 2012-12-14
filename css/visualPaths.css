@@ -1,0 +1,21 @@
+#map_canvas, #map_streetview {
+	float: left; 
+	width: 400px; 
+	height: 400px
+}
+
+#toolBox {
+	background: #eee;
+	margin: 20px;
+	padding: 10px;
+	border: 1px solid #666;
+	float: left;
+}
+
+#slider {
+	margin: 20px;
+}
+
+#routeButton {
+	margin: 20px;
+}
