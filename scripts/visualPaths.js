@@ -170,8 +170,10 @@ visualPaths = {
 	},
 
 	play: function() {
-		this.paused = false;
+		//var oldPause = this.pause;
 		this.stopped = false;
+		this.pause = false;
+		//if (oldPause) this.animatePath();
 	},
 
 	animatePath: function () {
@@ -181,10 +183,7 @@ visualPaths = {
 		if (this.coveredDistance >= this.distance) 
 			return;
 
-		if (this.paused){
-			setTimeout(function () { oldThis.animatePath(); }, 100);
-			return;
-		}
+		if (this.paused) return;
 
 		if (this.stopped == true)
 			this.coveredDistance = 0;
@@ -254,6 +253,28 @@ visualPaths = {
 
 		this.useStreetView = useStreetView;
 
+		/* Initialize circles on the map with decreasing radius size */
+		for (var i = 0; i < this.numCircles; i++) {
+			this.circles[i] = new google.maps.Circle({
+				fillColor: "#FF0000",
+				strokeColor: "#FF0000",
+				fillOpacity: 0.35,
+				strokeOpacity: 0.8,
+				strokeWeight: 1,
+				center: new google.maps.LatLng(44.496, 11.338),
+				radius: i/2
+			});
+		}
+
+		/* Initialize polyline used to manage routing 
+		 * points and to show current path 
+		 */
+		this.polyline = new google.maps.Polyline({
+			path : [],
+			strokeColor : '#00FF00',
+			strokeWeight : 2
+		});
+
 		/* Initialize map and link it to desired dom element */
 		this.map = new google.maps.Map(canvas, {
 			center: new google.maps.LatLng(44.496, 11.338),
@@ -292,28 +313,7 @@ visualPaths = {
 		this.directionsService.route(request, function (response, status) {
 			/* If a route is successfully retrived */
 			if (status == google.maps.DirectionsStatus.OK) {
-				/* Initialize circles on the map with decreasing radius size */
-				for (var i = 0; i < oldThis.numCircles; i++) {
-					oldThis.circles[i] = new google.maps.Circle({
-						fillColor: "#FF0000",
-						strokeColor: "#FF0000",
-						fillOpacity: 0.35,
-						strokeOpacity: 0.8,
-						strokeWeight: 1,
-						center: new google.maps.LatLng(44.496, 11.338),
-						radius: i/2
-					});
-				}
 				
-				/* Initialize polyline used to manage routing 
-				 * points and to show current path 
-				 */
-				oldThis.polyline = new google.maps.Polyline({
-					path : [],
-					strokeColor : '#00FF00',
-					strokeWeight : 2
-				});
-
 				/* Retrive first possible route */
 				var legs = response.routes[0].legs;
 
@@ -328,14 +328,13 @@ visualPaths = {
 					}
 				}
 
+				if(!oldThis.useStreetView) oldThis.polyline.setMap(oldThis.map);
+
 				/* Retrive total distance of the path */
 				if (oldThis.useMetres)
 					oldThis.distance = oldThis.pathLength(oldThis.polyline.getPath());
 				else
 					oldThis.distance = oldThis.polyline.getPath().length;
-				
-				/* Add polyline to map in order to draw it */
-				oldThis.polyline.setMap(oldThis.map);
 
 				/* Get starting point of the path */
 				var initialPoint = oldThis.polyline.getPath().getAt(0);
@@ -345,7 +344,7 @@ visualPaths = {
 				
 				/* Draw circles on the map on the starting point */
 				for(i=0; i < oldThis.numCircles; i++){
-					oldThis.circles[i].setMap(oldThis.map);
+					if(!oldThis.useStreetView) oldThis.circles[i].setMap(oldThis.map);
 					oldThis.circles[i].setCenter(initialPoint);
 				}
 

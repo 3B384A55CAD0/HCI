@@ -28,13 +28,13 @@
 			});
 
 			function play(){
-				visualPaths.play();
 				if($("#fromText").val() == "" || $("#toText").val() == "") return;
 
 				$("#playButton").attr("disabled", "disabled");
 				$("#stopButton").removeAttr("disabled");
 				$("#pauseButton").removeAttr("disabled");
-				visualPaths.calculateRoute($("#fromText").val(), $("#toText").val());
+				visualPaths.play();
+				if(!visualPaths.paused) visualPaths.calculateRoute($("#fromText").val(), $("#toText").val());
 			}
 
 			function stop(){
