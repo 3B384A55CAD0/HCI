@@ -15,9 +15,8 @@
 
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
-				var streetViewCanvas = $("#map_streetview")[0]
 				
-				visualPaths.init(canvas, false, stepCallback, onFinishCallback);		
+				visualPaths.init(canvas, true, stepCallback, onFinishCallback);		
 				
 				$("#playButton").click(play);
 				$("#stopButton").click(stop);

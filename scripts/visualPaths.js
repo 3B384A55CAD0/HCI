@@ -2,7 +2,7 @@ visualPaths = {
 	/* Constants */
 	
 	zoom: 18,
-	numCircles: 5,
+	numCircles: 10,
 	movementStep: 5,
 	useMetres: true,
 	moveCameraBoundPercentage: 0.1,
@@ -185,13 +185,16 @@ visualPaths = {
 
 		/* End iterations if the end of the path is reached */
 		if (this.coveredDistance >= this.totalDistance) {
-			if(this.onFinishCallback != null && typeof(this.onFinishCallback) != undefined) this.onFinishCallback();
+			if(this.onFinishCallback != null && typeof(this.onFinishCallback) != undefined)
+				this.onFinishCallback();
+
 			return;
 		}
 
-		if (this.paused) return;
+		if (this.paused) 
+			return;
 
-		if (this.stopped == true)
+		if (this.stopped)
 			this.coveredDistance = 0;
 
 		/* Retrive current position */
@@ -237,18 +240,28 @@ visualPaths = {
 		var alpha = this.alpha;
 		var newAlpha = this.getCurrentPOV();
 		var speed = this.movementStep * this.angleDeviation(newAlpha - alpha);
-		
-		this.coveredDistance += speed;		
 		this.alpha = newAlpha;
 
-		/* Loop back again */
-		var sleepTime = Math.min(500, this.movementSleep / this.angleDeviation(newAlpha - alpha));
-		
-		if(this.stepCallback != null && typeof(this.stepCallback) != undefined) this.stepCallback();
+		if (this.useStreetView) {
+			this.coveredDistance += speed;
+		} else {
+			this.coveredDistance += this.movementStep;
+		}
 
-		if(this.stopped){
-			for (j = 0; j < this.numCircles; j++) this.circles[j].setCenter(pos);
-		}else{
+		/* Loop back again */
+		var sleepTime;
+		
+		if (this.useStreetView)
+			sleepTime = Math.min(500, this.movementSleep / this.angleDeviation(newAlpha - alpha));
+		else
+			sleepTime = this.movementSleep;
+		
+		if(this.stepCallback != null && typeof(this.stepCallback) != undefined) 
+			this.stepCallback();
+
+		if (this.stopped) {
+			for (j=0; j < this.numCircles; j++) this.circles[j].setCenter(pos);
+		} else {
 			setTimeout(function () { oldThis.animatePath(); }, sleepTime);
 		}
 	},
