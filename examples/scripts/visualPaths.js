@@ -159,8 +159,11 @@ visualPaths = {
 	
 	animatePath: function () {
 		/* End iterations if the end of the path is reached */
-		if (this.coveredDistance >= this.distance) 
+		if (this.coveredDistance >= this.distance) {
+			console.log(this.coveredDistance);
+			console.log(this.distance);
 			return;
+		}
 
 		/* Retrive current position */
 		if (this.useMetres)
@@ -293,7 +296,7 @@ visualPaths = {
 				}
 
 				/* Retrive total distance of the path */
-				if (this.useMetres)
+				if (oldThis.useMetres)
 					oldThis.distance = oldThis.pathLength(oldThis.polyline.getPath());
 				else
 					oldThis.distance = oldThis.polyline.getPath().length;
