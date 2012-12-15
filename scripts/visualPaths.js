@@ -281,7 +281,7 @@ visualPaths = {
 			zoom: this.zoom,
 			mapTypeId: google.maps.MapTypeId.HYBRID
 		});
-
+		
 		if(this.useStreetView){
 			/* Initialize street-view map and link it to desired dom element */
 			this.panorama = new  google.maps.StreetViewPanorama(canvas, {
@@ -298,6 +298,13 @@ visualPaths = {
 		}
 
 		if (!this.useMetres) this.movementStep = 1;
+		
+		google.maps.event.addListener(panorama, 'pano_changed', function() {
+			console.log('pano changed');
+			//~ map.setZoom(8);
+			//~ map.setCenter(marker.getPosition());
+		});
+
 		
 	},
 	
