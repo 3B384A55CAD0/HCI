@@ -1,15 +1,40 @@
-#map_canvas, #map_streetview {
-	float: left; 
-	width: 400px; 
-	height: 400px
+
+html, body, #container, #map_canvas, #map_streetview {
+}
+
+#map_canvas {	
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 45px;
+}
+
+#map_canvas.extended {
+	bottom: 90px;	
 }
 
 #toolBox {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 25px;
 	background: #eee;
-	margin: 20px;
 	padding: 10px;
 	border: 1px solid #666;
-	float: left;
+}
+
+#errorLabel {
+	display: none;
+	padding-left: 5px;
+	color: #AA0000;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	font-size: 12px;
+}
+
+#toolBox.extended {
+	height: 70px;
 }
 
 #slider {

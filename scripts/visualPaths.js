@@ -375,7 +375,9 @@ visualPaths = {
 					oldThis.circles[i].setCenter(initialPoint);
 				}
 
-				if(callback != null && typeof(callback) != undefined) callback();
+				if(callback != null && typeof(callback) != undefined) callback(true);
+			}else{
+				if(callback != null && typeof(callback) != undefined) callback(false);
 			}
 		});
 	}
