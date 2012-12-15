@@ -12,6 +12,7 @@
 		<script type="text/javascript">
 			
 			var isSliding = false;
+			var uiEffectTime = 500;
 
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
@@ -25,35 +26,53 @@
 							
 				$("#fromText").keyup(checkFromAndTo);
 				$("#toText").keyup(checkFromAndTo);
-
+				
 			});
 
 			function play(){
 				
 				if ($("#fromText").val() == "" || $("#toText").val() == "") return;
 
-				$("#playButton").attr("disabled", "disabled");
-				$("#stopButton").removeAttr("disabled");
-				$("#pauseButton").removeAttr("disabled");
-				$("#fromText").attr("disabled", "disabled");
-				$("#toText").attr("disabled", "disabled");
-
 				if (visualPaths.paused){
+					$("#playButton").attr("disabled", "disabled");
+					$("#stopButton").removeAttr("disabled");
+					$("#pauseButton").removeAttr("disabled");
+					$("#fromText").attr("disabled", "disabled");
+					$("#toText").attr("disabled", "disabled");
+
+					$("#toolBox").addClass("extended", uiEffectTime);
+					$("#map_canvas").addClass("extended", uiEffectTime);
 					visualPaths.play();
 				} else { //where it is stopped or at the first time
-					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(){
+					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(existAPath){
 
-						$("#slider").slider({
-							range: "min",
-							min: 0,
-							max: visualPaths.totalDistance - 1,
-							value: 0,
-							//change: sliderChanged,
-							start: function () { isSliding = true } ,
-							stop: function () { isSliding = false; sliderChanged(); }
-						}).show();
-						
-						visualPaths.play();	
+
+						if(existAPath){
+
+							$("#playButton").attr("disabled", "disabled");
+							$("#stopButton").removeAttr("disabled");
+							$("#pauseButton").removeAttr("disabled");
+							$("#fromText").attr("disabled", "disabled");
+							$("#toText").attr("disabled", "disabled");
+
+							$("#toolBox").addClass("extended", uiEffectTime);
+							$("#map_canvas").addClass("extended", uiEffectTime);
+
+							$("#slider").slider({
+								range: "min",
+								min: 0,
+								max: visualPaths.totalDistance - 1,
+								value: 0,
+								//change: sliderChanged,
+								start: function () { isSliding = true } ,
+								stop: function () { isSliding = false; sliderChanged(); }
+							}).show();
+							
+							visualPaths.play();	
+						}else{
+							$("#errorLabel").html("Sorry, No routes has been founded!");
+							$("#errorLabel").fadeIn(uiEffectTime);
+						}
 
 					});
 				}
@@ -68,6 +87,8 @@
 				$("#fromText").removeAttr("disabled");
 				$("#toText").removeAttr("disabled");
 				$("#slider").hide();
+				$("#map_canvas").removeClass("extended", uiEffectTime);
+				$("#toolBox").removeClass("extended", uiEffectTime);
 			}
 
 			function pause() {
@@ -98,27 +119,33 @@
 				$("#fromText").removeAttr("disabled");
 				$("#toText").removeAttr("disabled");
 				$("#slider").hide();
+				$("#map_canvas").removeClass("extended", uiEffectTime);
+				$("#toolBox").removeClass("extended", uiEffectTime);
 			}
 
 			function checkFromAndTo(){
+				$("#errorLabel").fadeOut(uiEffectTime);
 				if(($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
 					$("#playButton").removeAttr("disabled");
+					if((event.keyCode ? event.keyCode : event.which) == 13) play();
 				}
 			}
 
 		</script>		
 	</head>
 	<body>
-		<div id="map_canvas"></div>		
-		
-		<div id="toolBox">
-			<input type="text" placeholder="From" id="fromText"/>
-			<input type="text" placeholder="To" id="toText"/>
-			<input type="button" value="Play" disabled="disabled" id="playButton"/>
-			<input type="button" value="Stop" disabled="disabled" id="stopButton"/>
-			<input type="button" value="Pause" disabled="disabled" id="pauseButton"/>
-			<div id="slider"></div>
+		<div id="container"> 
+			<div id="map_canvas"></div>		
+			
+			<div id="toolBox">
+				<input type="text" placeholder="From" id="fromText"/>
+				<input type="text" placeholder="To" id="toText"/>
+				<input type="button" value="Play" disabled="disabled" id="playButton"/>
+				<input type="button" value="Stop" disabled="disabled" id="stopButton"/>
+				<input type="button" value="Pause" disabled="disabled" id="pauseButton"/>
+				<span id="errorLabel">Error</span>
+				<div id="slider"></div>
+			</div>
 		</div>
-		
 	</body>
 </html>
