@@ -29,13 +29,21 @@
 				
 			});
 
+			function displayErrorMsg(errorMsg) {
+				$("#errorLabel").fadeOut(uiEffectTime, function () {
+					$("#errorLabel").html(errorMsg);
+					$("#errorLabel").fadeIn(uiEffectTime);	
+				});
+			}
+
+			function clearErrorMsg(){
+				$("#errorLabel").fadeOut(uiEffectTime);
+			}
+
 			function play(){
 				
 				if ($("#fromText").val() == "" || $("#toText").val() == ""){
-					$("#errorLabel").fadeOut(uiEffectTime, function () {
-						$("#errorLabel").html("Sorry, you should insert an origin and a destination.");
-						$("#errorLabel").fadeIn(uiEffectTime);	
-					});
+					displayErrorMsg("Sorry, you should insert an origin and a destination.");
 					return;
 				}
 
@@ -76,8 +84,7 @@
 							
 							visualPaths.play();	
 						}else{
-							$("#errorLabel").html("Sorry, No routes has been founded!");
-							$("#errorLabel").fadeIn(uiEffectTime);
+							displayErrorMsg("Sorry, No routes has been founded!");
 						}
 
 					});
@@ -130,7 +137,7 @@
 			}
 
 			function checkFromAndTo(){
-				$("#errorLabel").fadeOut(uiEffectTime);
+				clearErrorMsg();
 				if(($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
 					$("#playButton").removeAttr("disabled");
 				}else{
