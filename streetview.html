@@ -13,7 +13,8 @@
 			
 			var isSliding = false;
 			var uiEffectTime = 500;
-
+			
+			// MAIN
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
 				var streetViewCanvas = $("#map_streetview")[0]
@@ -21,56 +22,68 @@
 				visualPaths.movementStep = 10;
 				visualPaths.init(canvas, true, stepCallback, onFinishCallback);		
 				
-				$("#playButton").click(play);
+				$("#playButton").click(function() {
+					if ($("#playButton").val() == 'Play') {
+						play();
+					}
+					else {
+						pause();
+					}
+				});
 				$("#stopButton").click(stop);
 				$("#pauseButton").click(pause);
 							
 				$("#fromText").keyup(checkFromAndTo);
 				$("#toText").keyup(checkFromAndTo);
 				
+				$("#slider").slider({
+					range: "min",
+					min: 0,
+					max: visualPaths.totalDistance - 1,
+					value: 0,
+					//change: sliderChanged,
+					start: function () { isSliding = true } ,
+					stop: function () { isSliding = false; sliderChanged(); }
+				}).show();
+				
+				$("#map_canvas").addClass("extended", uiEffectTime);
+				$("#toolBox").addClass("extended", uiEffectTime);
+				
 			});
 
-			function play(){
+			function play() {
 				
 				if ($("#fromText").val() == "" || $("#toText").val() == "") return;
 
 				if (visualPaths.paused){
-					$("#playButton").attr("disabled", "disabled");
+					//$("#playButton").attr("disabled", "disabled");
 					$("#stopButton").removeAttr("disabled");
-					$("#pauseButton").removeAttr("disabled");
+					$("#playButton").attr('value', 'Pause');
+					//$("#pauseButton").removeAttr("disabled");
 					$("#fromText").attr("disabled", "disabled");
 					$("#toText").attr("disabled", "disabled");
 
-					$("#toolBox").addClass("extended", uiEffectTime);
-					$("#map_canvas").addClass("extended", uiEffectTime);
+					//$("#toolBox").addClass("extended", uiEffectTime);
+					//$("#map_canvas").addClass("extended", uiEffectTime);
 					visualPaths.play();
-				} else { //where it is stopped or at the first time
+				} else { // when it is stopped or the first time
 					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(existAPath){
 
+						if (existAPath) {
 
-						if(existAPath){
-
-							$("#playButton").attr("disabled", "disabled");
+							//$("#playButton").attr("disabled", "disabled");
+							$("#playButton").attr('value', 'Pause');
 							$("#stopButton").removeAttr("disabled");
-							$("#pauseButton").removeAttr("disabled");
+							//$("#pauseButton").removeAttr("disabled");
 							$("#fromText").attr("disabled", "disabled");
 							$("#toText").attr("disabled", "disabled");
-
-							$("#toolBox").addClass("extended", uiEffectTime);
-							$("#map_canvas").addClass("extended", uiEffectTime);
-
-							$("#slider").slider({
-								range: "min",
-								min: 0,
-								max: visualPaths.totalDistance - 1,
-								value: 0,
-								//change: sliderChanged,
-								start: function () { isSliding = true } ,
-								stop: function () { isSliding = false; sliderChanged(); }
-							}).show();
+							
+							//$("#toolBox").addClass("extended", uiEffectTime);
+							//$("#map_canvas").addClass("extended", uiEffectTime);
 							
 							visualPaths.play();	
-						}else{
+						}
+						else {
 							$("#errorLabel").html("Sorry, No routes has been founded!");
 							$("#errorLabel").fadeIn(uiEffectTime);
 						}
@@ -87,15 +100,16 @@
 				$("#playButton").removeAttr("disabled");
 				$("#fromText").removeAttr("disabled");
 				$("#toText").removeAttr("disabled");
-				$("#slider").hide();
-				$("#map_canvas").removeClass("extended", uiEffectTime);
-				$("#toolBox").removeClass("extended", uiEffectTime);
+				//$("#slider").hide();
+				//$("#map_canvas").removeClass("extended", uiEffectTime);
+				//$("#toolBox").removeClass("extended", uiEffectTime);
 			}
 
 			function pause() {
 				visualPaths.pause();
 				$("#pauseButton").attr("disabled", "disabled");
-				$("#playButton").removeAttr("disabled");
+				//$("#playButton").removeAttr("disabled");
+				$("#playButton").attr('value', 'Play');
 			}
 
 			function sliderChanged() {
@@ -107,7 +121,7 @@
 				}
 			}
 
-			/* Called for each step of the animate */
+			/* Called at each step of the animation */
 			function stepCallback() {
 				if (!isSliding)
 					$("#slider").slider("value", visualPaths.coveredDistance);
@@ -119,17 +133,18 @@
 				$("#playButton").removeAttr("disabled");
 				$("#fromText").removeAttr("disabled");
 				$("#toText").removeAttr("disabled");
-				$("#slider").hide();
-				$("#map_canvas").removeClass("extended", uiEffectTime);
-				$("#toolBox").removeClass("extended", uiEffectTime);
+				//$("#slider").hide();
+				//$("#map_canvas").removeClass("extended", uiEffectTime);
+				//$("#toolBox").removeClass("extended", uiEffectTime);
 			}
-
-			function checkFromAndTo(){
-				$("#errorLabel").fadeOut(uiEffectTime);
-				if(($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
-					$("#playButton").removeAttr("disabled");
-					if((event.keyCode ? event.keyCode : event.which) == 13) play();
-				}
+			
+			/* Checks input forms "From" and "To" */
+			function checkFromAndTo() {
+				//$("#errorLabel").fadeOut(uiEffectTime);
+				//if (($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
+					//$("#playButton").removeAttr("disabled");
+					//if((event.keyCode ? event.keyCode : event.which) == 13) play();
+				//}
 			}
 
 		</script>		
@@ -141,9 +156,9 @@
 			<div id="toolBox">
 				<input type="text" placeholder="From" id="fromText"/>
 				<input type="text" placeholder="To" id="toText"/>
-				<input type="button" value="Play" disabled="disabled" id="playButton"/>
+				<input type="button" value="Play" id="playButton"/>
 				<input type="button" value="Stop" disabled="disabled" id="stopButton"/>
-				<input type="button" value="Pause" disabled="disabled" id="pauseButton"/>
+				<!--input type="button" value="Pause" disabled="disabled" id="pauseButton"/-->
 				<span id="errorLabel">Error</span>
 				<div id="slider"></div>
 			</div>

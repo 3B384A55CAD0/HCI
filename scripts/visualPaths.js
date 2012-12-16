@@ -322,11 +322,11 @@ visualPaths = {
 
 		if (!this.useMetres) this.movementStep = 1;
 		
-		google.maps.event.addListener(panorama, 'pano_changed', function() {
-			console.log('pano changed');
-			//~ map.setZoom(8);
-			//~ map.setCenter(marker.getPosition());
-		});
+		//~ google.maps.event.addListener(panorama, 'pano_changed', function() {
+			//~ console.log('pano changed');
+			//map.setZoom(8);
+			//map.setCenter(marker.getPosition());
+		//~ });
 
 		
 	},
