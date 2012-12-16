@@ -31,7 +31,13 @@
 
 			function play(){
 				
-				if ($("#fromText").val() == "" || $("#toText").val() == "") return;
+				if ($("#fromText").val() == "" || $("#toText").val() == ""){
+					$("#errorLabel").fadeOut(uiEffectTime, function () {
+						$("#errorLabel").html("Sorry, you should insert an origin and a destination.");
+						$("#errorLabel").fadeIn(uiEffectTime);	
+					});
+					return;
+				}
 
 				if (visualPaths.paused){
 					$("#playButton").attr("disabled", "disabled");
@@ -127,6 +133,8 @@
 				$("#errorLabel").fadeOut(uiEffectTime);
 				if(($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
 					$("#playButton").removeAttr("disabled");
+				}else{
+					$("#playButton").attr("disabled", "disabled");
 				}
 			}
 
