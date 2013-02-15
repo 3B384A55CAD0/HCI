@@ -13,8 +13,7 @@
 			
 			var isSliding = false;
 			var uiEffectTime = 500;
-			
-			// MAIN
+
 			$(document).ready(function() {
 				var canvas = $("#map_canvas")[0];
 				var streetViewCanvas = $("#map_streetview")[0]
@@ -22,63 +21,58 @@
 				visualPaths.movementStep = 10;
 				visualPaths.init(canvas, true, stepCallback, onFinishCallback);		
 				
-				$("#playButton").click(function() {
-					if ($("#playButton").val() == 'Play') {
-						play();
-					}
-					else {
-						pause();
-					}
-				});
+				$("#playButton").click(play);
 				$("#stopButton").click(stop);
 				$("#pauseButton").click(pause);
 							
 				$("#fromText").keyup(checkFromAndTo);
 				$("#toText").keyup(checkFromAndTo);
 				
-				$("#slider").slider({
-					range: "min",
-					min: 0,
-					max: 1,
-					value: 0,
-				}).show();
-				
-				$("#map_canvas").addClass("extended", uiEffectTime);
-				$("#toolBox").addClass("extended", uiEffectTime);
-				
 			});
 
-			function play() {
+			function displayErrorMsg(errorMsg) {
+				$("#errorLabel").fadeOut(uiEffectTime, function () {
+					$("#errorLabel").html(errorMsg);
+					$("#errorLabel").fadeIn(uiEffectTime);	
+				});
+			}
+
+			function clearErrorMsg(){
+				$("#errorLabel").fadeOut(uiEffectTime);
+			}
+
+			function play(){
 				
-				if ($("#fromText").val() == "" || $("#toText").val() == "") return;
+				if ($("#fromText").val() == "" || $("#toText").val() == ""){
+					displayErrorMsg("Sorry, you should insert an origin and a destination.");
+					return;
+				}
 
 				if (visualPaths.paused){
-					//$("#playButton").attr("disabled", "disabled");
+					$("#playButton").attr("disabled", "disabled");
 					$("#stopButton").removeAttr("disabled");
-					$("#playButton").attr('value', 'Pause');
-					//$("#pauseButton").removeAttr("disabled");
+					$("#pauseButton").removeAttr("disabled");
 					$("#fromText").attr("disabled", "disabled");
 					$("#toText").attr("disabled", "disabled");
 
-					//$("#toolBox").addClass("extended", uiEffectTime);
-					//$("#map_canvas").addClass("extended", uiEffectTime);
+					$("#toolBox").addClass("extended", uiEffectTime);
+					$("#map_canvas").addClass("extended", uiEffectTime);
 					visualPaths.play();
-				} else { // when it is stopped or the first time
+				} else { //where it is stopped or at the first time
 					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(existAPath){
 
-						if (existAPath) {
 
-							//$("#playButton").attr("disabled", "disabled");
-							$("#playButton").attr('value', 'Pause');
+						if(existAPath){
+
+							$("#playButton").attr("disabled", "disabled");
 							$("#stopButton").removeAttr("disabled");
-							//$("#pauseButton").removeAttr("disabled");
+							$("#pauseButton").removeAttr("disabled");
 							$("#fromText").attr("disabled", "disabled");
 							$("#toText").attr("disabled", "disabled");
-							
-							//$("#toolBox").addClass("extended", uiEffectTime);
-							//$("#map_canvas").addClass("extended", uiEffectTime);
-							
-							
+
+							$("#toolBox").addClass("extended", uiEffectTime);
+							$("#map_canvas").addClass("extended", uiEffectTime);
+
 							$("#slider").slider({
 								range: "min",
 								min: 0,
@@ -88,12 +82,10 @@
 								start: function () { isSliding = true } ,
 								stop: function () { isSliding = false; sliderChanged(); }
 							}).show();
-				
+							
 							visualPaths.play();	
-						}
-						else {
-							$("#errorLabel").html("Sorry, No routes have been found!");
-							$("#errorLabel").fadeIn(uiEffectTime);
+						}else{
+							displayErrorMsg("Sorry, No routes have been found!");
 						}
 
 					});
@@ -103,22 +95,20 @@
 
 			function stop() {
 				visualPaths.stop();
-				$("#playButton").attr('value', 'Play');
 				$("#stopButton").attr("disabled", "disabled");
 				$("#pauseButton").attr("disabled", "disabled");
 				$("#playButton").removeAttr("disabled");
 				$("#fromText").removeAttr("disabled");
 				$("#toText").removeAttr("disabled");
-				//$("#slider").hide();
-				//$("#map_canvas").removeClass("extended", uiEffectTime);
-				//$("#toolBox").removeClass("extended", uiEffectTime);
+				$("#slider").hide();
+				$("#map_canvas").removeClass("extended", uiEffectTime);
+				$("#toolBox").removeClass("extended", uiEffectTime);
 			}
 
 			function pause() {
 				visualPaths.pause();
 				$("#pauseButton").attr("disabled", "disabled");
-				//$("#playButton").removeAttr("disabled");
-				$("#playButton").attr('value', 'Play');
+				$("#playButton").removeAttr("disabled");
 			}
 
 			function sliderChanged() {
@@ -130,7 +120,7 @@
 				}
 			}
 
-			/* Called at each step of the animation */
+			/* Called for each step of the animate */
 			function stepCallback() {
 				if (!isSliding)
 					$("#slider").slider("value", visualPaths.coveredDistance);
@@ -138,26 +128,25 @@
 
 			function onFinishCallback() {
 				$("#stopButton").attr("disabled", "disabled");
-				$("#playButton").attr('value', 'Play');
-				//$("#pauseButton").attr("disabled", "disabled");
-				//$("#playButton").removeAttr("disabled");
+				$("#pauseButton").attr("disabled", "disabled");
+				$("#playButton").removeAttr("disabled");
 				$("#fromText").removeAttr("disabled");
 				$("#toText").removeAttr("disabled");
-				//$("#slider").hide();
-				//$("#map_canvas").removeClass("extended", uiEffectTime);
-				//$("#toolBox").removeClass("extended", uiEffectTime);
-			}
-			
-			/* Checks input forms "From" and "To" */
-			function checkFromAndTo() {
-				$("#errorLabel").fadeOut(uiEffectTime);
-				//if (($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
-					//$("#playButton").removeAttr("disabled");
-					//if((event.keyCode ? event.keyCode : event.which) == 13) play();
-				//}
+				$("#slider").hide();
+				$("#map_canvas").removeClass("extended", uiEffectTime);
+				$("#toolBox").removeClass("extended", uiEffectTime);
 			}
 
-		</script>		
+			function checkFromAndTo(){
+				clearErrorMsg();
+				if(($("#fromText").val().length > 0) && ($("#toText").val().length > 0)) {
+					$("#playButton").removeAttr("disabled");
+				}else{
+					$("#playButton").attr("disabled", "disabled");
+				}
+			}
+
+		</script>
 	</head>
 	<body>
 		<div id="container"> 
@@ -168,7 +157,7 @@
 				<input type="text" placeholder="To" id="toText"/>
 				<input type="button" value="Play" id="playButton" style="width: 80px;"/>
 				<input type="button" value="Stop" disabled="disabled" id="stopButton"/>
-				<!--input type="button" value="Pause" disabled="disabled" id="pauseButton"/-->
+				<input type="button" value="Pause" disabled="disabled" id="pauseButton"/>
 				<span id="errorLabel">Error</span>
 				<div id="slider"></div>
 			</div>
