@@ -9,6 +9,7 @@
     	<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
     	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 		<script type="text/javascript" src="scripts/visualPaths.js"></script>
+		<script type="text/javascript" src="scripts/visualPathsPredefinedDestinations.js"></script>
 		<script type="text/javascript">
 			
 			var isSliding = false;
@@ -58,8 +59,21 @@
 					$("#map_canvas").addClass("extended", uiEffectTime);
 					visualPaths.play();
 				} else { //where it is stopped or at the first time
-					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(existAPath){
 
+					var routeFrom, routeTo, routeWaypoints;
+
+					var pdDest = visualPaths_getPredefinedDestination($("#fromText").val(), $("#toText").val());
+					if (pdDest != null) {
+						routeFrom = pdDest.from;
+						routeTo = pdDest.to;
+						routeWaypoints = pdDest.waypoints;
+					} else { 
+						routeFrom = $("#fromText").val();
+						routeTo = $("#toText").val();
+						routeWaypoints = null;
+					}
+
+					visualPaths.calculateRoute(routeFrom, routeTo, routeWaypoints, function(existAPath){
 
 						if(existAPath){
 

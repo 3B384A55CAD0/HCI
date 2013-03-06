@@ -331,11 +331,12 @@ visualPaths = {
 		
 	},
 	
-	calculateRoute: function (origin, destination, callback) {
+	calculateRoute: function (origin, destination, waypoints, callback) {
 		var request = {
 			origin : origin,
 			destination : destination,
-			travelMode : google.maps.DirectionsTravelMode.DRIVING
+			travelMode : google.maps.DirectionsTravelMode.DRIVING,
+			waypoints : waypoints
 		};
 		
 		oldThis = this;

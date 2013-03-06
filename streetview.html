@@ -59,7 +59,21 @@
 					$("#map_canvas").addClass("extended", uiEffectTime);
 					visualPaths.play();
 				} else { //where it is stopped or at the first time
-					visualPaths.calculateRoute($("#fromText").val(), $("#toText").val(), function(existAPath){
+
+					var routeFrom, routeTo, routeWaypoints;
+
+					var pdDest = visualPaths_getPredefinedDestination($("#fromText").val(), $("#toText").val());
+					if (pdDest != null) {
+						routeFrom = pdDest.from;
+						routeTo = pdDest.to;
+						routeWaypoints = pdDest.waypoints;
+					} else { 
+						routeFrom = $("#fromText").val();
+						routeTo = $("#toText").val();
+						routeWaypoints = null;
+					}
+
+					visualPaths.calculateRoute(routeFrom, routeTo, routeWaypoints, function(existAPath){
 
 
 						if(existAPath){
