@@ -9,7 +9,7 @@ var visualPaths_predefinedDestinations = [
 		]*/
 	},{
 		from: "Rooseveltova, Plzen",
-		to: "Pětatřicátníků, Plzen",
+		to: "PetatriCatniku, Plzen",
 		waypoints: null
 		/*[
 			{location: new google.maps.LatLng(60.385, 5.3232), stopover: false},	
@@ -18,7 +18,7 @@ var visualPaths_predefinedDestinations = [
  		]*/
 	},{
 		from: "Grodzka, Krakow",
-		to: "Rydlówka, Krakow",
+		to: "Rydlowka, Krakow",
 		waypoints: null 
 	}
 ];
