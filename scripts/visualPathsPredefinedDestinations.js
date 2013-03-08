@@ -10,10 +10,10 @@ var visualPaths_predefinedDestinations = [
 		from: new google.maps.LatLng(60.3913, 5.3256),
 		to: new google.maps.LatLng(60.3894, 5.3308),
 		waypoints: [
- 			{location: new google.maps.LatLng(60.3485, 5.3232), stopover: false}/*,
-            {location: new google.maps.LatLng(60.38793, 5.3284), stopover: false},
-            {location: new google.maps.LatLng(60.3884, 5.3292), stopover: false}*/
-        ]
+			{location: new google.maps.LatLng(60.3585, 5.3232), stopover: false}/*,	
+			{location: new google.maps.LatLng(60.38793, 5.3284), stopover: false},
+			{location: new google.maps.LatLng(60.3884, 5.3292), stopover: false}*/
+ 		]
 	}
 ];
 
