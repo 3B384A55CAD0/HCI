@@ -1,0 +1,72 @@
+\documentclass[paper=a4, fontsize=12pt]{scrartcl} % A4 paper and 11pt font size
+
+% l'interlinea
+\linespread{1.4}
+\setlength{\parskip}{0.3cm plus4mm minus3mm} % spazio verticale paragrafi
+
+\usepackage[italian]{babel} % Italian language
+\usepackage[utf8x]{inputenc} % utf8
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font
+
+\usepackage{graphicx}
+
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{ \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\usepackage[font=small,labelfont=bf]{caption} %Style of the caption of figures
+\usepackage{float} %to force the figure position
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+%----------------------------------------------------------------------------------------
+% TITLE
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+
+\title{	
+\normalfont \normalsize 
+\textsc{Università degli studi di Bologna} \\ [25pt]
+\horrule{0.5pt} \\[0.4cm]
+\huge Titolo \\
+\horrule{2pt} \\[0.5cm]
+}
+
+\author{Autore}
+
+\date{\normalsize\today}
+
+\begin{document}
+
+\maketitle
+
+%----------------------------------------------------------------------------------------
+% INTRODUZIONE
+%----------------------------------------------------------------------------------------
+
+\section{Introduzione}
+
+\input{introduzione}
+
+
+%Bibliografia%---------------------------------------------------------------
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{chapter}{\refname}\nocite{*}
+\bibliography{text}
+%----------------------------------------------------------------------------
+
+\end{document}
